@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,7 +17,7 @@ const router = createRouter({
       name: 'Sub',
       meta: {
         title: '订阅面板',
-        whiteList: true
+        whiteList: false
       },
       component: () => import('../views/SubView.vue')
     },
@@ -31,42 +31,34 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue')
     },
     {
-      path: '/register',
-      name: 'Register',
+      path: '/admin',
+      name: 'Admin',
       meta: {
-        title: '注册',
-        whiteList: true
+        title: '管理',
+        whiteList: false
       },
-      component: () => import('../views/RegisterView.vue')
+      component: () => import('../views/AdminView.vue')
     },
     {
-      path: '/*',
+      path: '/:pathMatch(.*)*',
       redirect: '/'
     }
   ]
-})
+});
 
 router.beforeEach((to, from, next) => {
-  // 设置网页标题
-  document.title = to.meta.title + " | 一条订阅"
-  // 获取 token
-  const token = localStorage.getItem('token')
-  // 判断是否需要登录
+  document.title = to.meta.title + " | 一条订阅";
+  const token = localStorage.getItem('token');
+
   if (to.meta.whiteList) {
-    // 不需要登录
-    next()
+    next();
   } else {
-    // 需要登录
     if (token && token.trim() !== '' && token.length > 20) {
-      // 已登录
-      next()
+      next();
     } else {
-      // 未登录
-      next('/login')
+      next('/login');
     }
   }
+});
 
-
-})
-
-export default router
+export default router;

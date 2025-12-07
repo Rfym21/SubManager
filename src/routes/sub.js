@@ -1,26 +1,54 @@
-app.get('/proxy', verifyToken(), async ctx => {
+const express = require('express');
+const axios = require('axios');
+const router = express.Router();
+const config = require('../config/index.js');
+const { verifySubApiToken, verifyAdminToken } = require('../middleware/authorization.js');
+const { getSubLinks } = require('../utils/manager.js');
 
-  const proxy = await getProxy(ctx.rule, ctx.rules, ctx.number, ctx.level)
+/**
+ * 获取订阅链接信息（需要管理员认证）
+ */
+router.get('/sub/info', verifyAdminToken, (req, res) => {
+    res.json({
+        status: true,
+        data: {
+            base64_url: `${config.host}/base64?token=${config.sub_api_token}`,
+            sub_url: `${config.host}/sub?token=${config.sub_api_token}`
+        }
+    });
+});
 
-  if (proxy === false) {
-    ctx.header['Content-Type'] = 'text/html'
-    ctx.body = '<h1 style="margin: 200px auto; width: 300px; text-align: center;font-size:48px;">Token无效</h1>'
-  } else {
-    ctx.body = proxy
-  }
-})
+router.get('/base64', verifySubApiToken, async (req, res) => {
+    try {
+        const data = await getSubLinks();
+        res.send(data);
+    } catch (e) {
+        res.status(500).json({ status: false, message: e.message });
+    }
+});
 
-app.get('/', verifyToken(), async ctx => {
-  const res = await axios.get(`${config.subconverter}/sub?target=clash&url=https%3A%2F%2F${config.host}%2Fproxy%3Ftoken%3D${ctx.token_body}&config=https%3A%2F%2Fraw.githubusercontent.com%2FACL4SSR%2FACL4SSR%2Fmaster%2FClash%2Fconfig%2FACL4SSR_Online_Full_MultiMode.ini`)
-  ctx.body = res.data
-})
+router.get('/sub', verifySubApiToken, async (req, res) => {
+    try {
+        const params = new URLSearchParams({
+            target: 'clash',
+            url: `${config.host}/base64?token=${config.sub_api_token}`,
+            config: config.sub_config,
+            emoji: 'true',
+            list: 'false',
+            xudp: 'true',
+            udp: 'true',
+            tfo: 'false',
+            exclude: config.exclude,
+            scv: 'true',
+            fdn: 'false',
+            new_name: 'true',
+            filename: config.filename
+        });
+        const result = await axios.get(`${config.subconverter}/sub?${params.toString()}`);
+        res.send(result.data);
+    } catch (e) {
+        res.status(500).json({ status: false, message: e.message });
+    }
+});
 
-app.get('/files', verifyToken(), async ctx => {
-  const files = config.level[ctx.level]
-
-  ctx.body = {
-    code: 8200,
-    message: '获取成功',
-    files
-  }
-})
+module.exports = router;

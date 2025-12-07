@@ -13,8 +13,6 @@
           <van-field v-model="state.username" name="username" label="用户名" placeholder="请输入用户名"
             :rules="[{ required: true, message: '请填写用户名' }]" />
 
-          <van-field v-model="state.nickname" name="nickname" label="昵称" placeholder="请输入昵称"
-            :rules="[{ required: true, message: '请填写昵称' }]" />
 
           <van-field v-model="state.password" type="password" name="password" label="密码" placeholder="请输入密码"
             :rules="[{ required: true, message: '请填写密码' }]" />
@@ -22,7 +20,7 @@
         </van-cell-group>
 
         <div style="margin: 16px;" class="text-center rounded-full">
-          <van-button round block native-type="submit" :disabled="state.status">注册订阅</van-button>
+          <van-button round block native-type="submit" :disabled="state.status">开启订阅</van-button>
         </div>
 
       </van-form>
@@ -31,38 +29,40 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
-import { useRouter } from 'vue-router'
-import { register } from '../api/axios.js'
-import { showDialog } from 'vant'
+import { reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import { login } from '../api/axios.js';
+import { showDialog } from 'vant';
 
-const router = useRouter()
+const router = useRouter();
 const state = reactive({
   username: '',
   password: '',
-  nickname: '',
   status: false
-})
+});
+
 
 const onSubmit = async (value) => {
-  state.status = true
-  const { username, password, nickname } = value
+  state.status = true;
+  const { username, password } = value;
+  const data = await login(username, password);
 
-  let data = await register(username, nickname, password)
-  if (data.code && data.code === 8200) {
+  if (data.status) {
+    localStorage.setItem('token', data.data.access_token);
+    localStorage.setItem('username', data.data.username);
     showDialog({
-      title: '注册成功',
-      message: '注册成功,正在前往登录页！',
-    })
-    router.push('/login')
+      title: '一条消息',
+      message: '登录成功,正在跳转管理页!',
+    });
+    router.push('/admin');
   } else {
     showDialog({
-      title: '注册失败',
-      message: data.message,
-    })
+      title: '一条消息',
+      message: data.message || '登录失败',
+    });
   }
-  state.status = false
-}
+  state.status = false;
+};
 </script>
 
 <style lang="css" scoped>
