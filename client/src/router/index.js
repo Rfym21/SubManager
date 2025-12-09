@@ -7,7 +7,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       meta: {
-        title: '首页',
+        title: 'Home',
         whiteList: true
       },
       component: () => import('../views/HomeView.vue')
@@ -16,7 +16,7 @@ const router = createRouter({
       path: '/sub',
       name: 'Sub',
       meta: {
-        title: '订阅面板',
+        title: 'Subscription Panel',
         whiteList: false
       },
       component: () => import('../views/SubView.vue')
@@ -25,7 +25,7 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       meta: {
-        title: '登录',
+        title: 'Login',
         whiteList: true
       },
       component: () => import('../views/LoginView.vue')
@@ -34,7 +34,7 @@ const router = createRouter({
       path: '/admin',
       name: 'Admin',
       meta: {
-        title: '管理',
+        title: 'Dashboard Panel',
         whiteList: false
       },
       component: () => import('../views/AdminView.vue')
@@ -47,7 +47,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title + " | 一条订阅";
+  document.title = to.meta.title + " | A Subscription";
   const token = localStorage.getItem('token');
 
   if (to.meta.whiteList) {

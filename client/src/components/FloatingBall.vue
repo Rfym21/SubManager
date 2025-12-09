@@ -86,7 +86,9 @@ const handleLogout = () => {
   position: fixed;
   width: 50px;
   height: 50px;
-  background: white;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -99,6 +101,7 @@ const handleLogout = () => {
   user-select: none;
   touch-action: none;
   transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .floating-ball:hover {

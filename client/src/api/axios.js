@@ -1,10 +1,4 @@
 import axios from 'axios';
-
-const instance = axios.create({
-    baseURL: 'http://localhost:8103',
-    timeout: 1000 * 30
-});
-
 /**
  * 获取 Authorization 请求头
  * @returns {Object} headers
@@ -23,7 +17,7 @@ const getAuthHeaders = () => {
  */
 export const login = async (username, password) => {
     try {
-        const res = await instance.post('/login', { username, password });
+        const res = await axios.post('/login', { username, password });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };
@@ -35,7 +29,7 @@ export const login = async (username, password) => {
  */
 export const getConfig = async () => {
     try {
-        const res = await instance.get('/config', { headers: getAuthHeaders() });
+        const res = await axios.get('/config', { headers: getAuthHeaders() });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };
@@ -48,7 +42,7 @@ export const getConfig = async () => {
  */
 export const updateConfig = async (data) => {
     try {
-        const res = await instance.patch('/config', data, { headers: getAuthHeaders() });
+        const res = await axios.patch('/config', data, { headers: getAuthHeaders() });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };
@@ -60,7 +54,7 @@ export const updateConfig = async (data) => {
  */
 export const getSubLinks = async () => {
     try {
-        const res = await instance.get('/config/sub_links', { headers: getAuthHeaders() });
+        const res = await axios.get('/config/sub_links', { headers: getAuthHeaders() });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };
@@ -73,7 +67,7 @@ export const getSubLinks = async () => {
  */
 export const addSubLink = async (data) => {
     try {
-        const res = await instance.post('/config/sub_links', data, { headers: getAuthHeaders() });
+        const res = await axios.post('/config/sub_links', data, { headers: getAuthHeaders() });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };
@@ -87,7 +81,7 @@ export const addSubLink = async (data) => {
  */
 export const updateSubLink = async (filename, data) => {
     try {
-        const res = await instance.patch(`/config/sub_links/${filename}`, data, { headers: getAuthHeaders() });
+        const res = await axios.patch(`/config/sub_links/${filename}`, data, { headers: getAuthHeaders() });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };
@@ -100,7 +94,7 @@ export const updateSubLink = async (filename, data) => {
  */
 export const deleteSubLink = async (filename) => {
     try {
-        const res = await instance.delete(`/config/sub_links/${filename}`, { headers: getAuthHeaders() });
+        const res = await axios.delete(`/config/sub_links/${filename}`, { headers: getAuthHeaders() });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };
@@ -113,7 +107,7 @@ export const deleteSubLink = async (filename) => {
  */
 export const getFileContent = async (filename) => {
     try {
-        const res = await instance.get(`/config/files/${filename}`, { headers: getAuthHeaders() });
+        const res = await axios.get(`/config/files/${filename}`, { headers: getAuthHeaders() });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };
@@ -127,7 +121,7 @@ export const getFileContent = async (filename) => {
  */
 export const updateFileContent = async (filename, content) => {
     try {
-        const res = await instance.put(`/config/files/${filename}`, { content }, { headers: getAuthHeaders() });
+        const res = await axios.put(`/config/files/${filename}`, { content }, { headers: getAuthHeaders() });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };
@@ -140,7 +134,7 @@ export const updateFileContent = async (filename, content) => {
  */
 export const deleteFile = async (filename) => {
     try {
-        const res = await instance.delete(`/config/files/${filename}`, { headers: getAuthHeaders() });
+        const res = await axios.delete(`/config/files/${filename}`, { headers: getAuthHeaders() });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };
@@ -152,7 +146,7 @@ export const deleteFile = async (filename) => {
  */
 export const getSubInfo = async () => {
     try {
-        const res = await instance.get('/sub/info', { headers: getAuthHeaders() });
+        const res = await axios.get('/sub/info', { headers: getAuthHeaders() });
         return res.data;
     } catch (err) {
         return { status: false, message: err.message };

@@ -1,23 +1,20 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen py-20">
-    <div class="w-5/6 mx-auto text-center">
-      <div class="w-48 h-48 overflow-hidden rounded-full mx-auto">
-        <img class="w-full" src="../assets/author.png" alt="">
-      </div>
-      <p class="text-2xl font-bold my-6">获取订阅链接</p>
+    <div class="w-5/6 mx-auto text-center max-w-[720px]">
+      <p class="text-2xl font-bold my-6">Get Subscription Links</p>
 
       <p class="text-left text-base mb-4">
-        <span class="font-bold text-lg">说明: </span>点击下方按钮复制订阅链接，粘贴到您的代理客户端即可使用。
+        <span class="font-bold text-lg">Note: </span>Click the buttons below to copy the subscription links, and paste them into your proxy client to use.
       </p>
 
       <div class="mb-4">
-        <p class="text-left text-sm font-bold mb-1">Clash 订阅链接:</p>
+        <p class="text-left text-sm font-bold mb-1">Clash Subscription Link:</p>
         <input type="text" disabled :value="subInfo.sub_url"
           class="w-full block bg-black bg-opacity-30 backdrop-filter backdrop-blur-md text-black rounded-xl px-4 py-2 h-12 text-sm">
       </div>
 
       <div class="mb-4">
-        <p class="text-left text-sm font-bold mb-1">Base64 订阅链接:</p>
+        <p class="text-left text-sm font-bold mb-1">Base64 Subscription Link:</p>
         <input type="text" disabled :value="subInfo.base64_url"
           class="w-full block bg-black bg-opacity-30 backdrop-filter backdrop-blur-md text-black rounded-xl px-4 py-2 h-12 text-sm">
       </div>
@@ -25,19 +22,19 @@
       <button
         class="w-full bg-black bg-opacity-80 backdrop-filter backdrop-blur-md text-white rounded-xl px-20 py-3 hover:bg-opacity-50 hover:shadow-lg transition duration-300 focus:outline-none mb-3"
         @click="copyLink(subInfo.sub_url)">
-        复制 Clash 链接
+        Copy Clash Link
       </button>
 
       <button
-        class="w-full bg-gray-700 bg-opacity-80 backdrop-filter backdrop-blur-md text-white rounded-xl px-20 py-3 hover:bg-opacity-50 hover:shadow-lg transition duration-300 focus:outline-none mb-6"
+        class="w-full bg-black bg-opacity-80 backdrop-filter backdrop-blur-md text-white rounded-xl px-20 py-3 hover:bg-opacity-50 hover:shadow-lg transition duration-300 focus:outline-none mb-6"
         @click="copyLink(subInfo.base64_url)">
-        复制 Base64 链接
+        Copy Base64 Link
       </button>
 
       <button
         class="w-full bg-white bg-opacity-30 backdrop-filter backdrop-blur-md text-black rounded-xl px-20 py-3 hover:bg-opacity-50 hover:shadow-lg transition duration-300 focus:outline-none"
         @click="router.push('/')">
-        返回首页
+        Back to Home
       </button>
     </div>
 

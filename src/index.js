@@ -26,7 +26,38 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'));
 });
 
+// ---------------------------------以下为全局错误处理---------------------------------
+/**
+ * 全局错误处理中间件
+ */
+app.use((err, req, res, next) => {
+    console.error('全局错误:', err);
+
+    if (res.headersSent) {
+        return next(err);
+    }
+
+    res.status(500).json({
+        status: false,
+        message: 'Server Error, please try again later.'
+    });
+});
+
+/**
+ * 处理未捕获的Promise rejection
+ */
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('未处理的Promise rejection:', reason);
+});
+
+/**
+ * 处理未捕获的异常
+ */
+process.on('uncaughtException', (error) => {
+    console.error('未捕获的异常:', error);
+});
+
 // ---------------------------------以下为服务启动---------------------------------
 app.listen(process.env.PORT || 8103, async () => {
-    console.log(`服务在端口${process.env.PORT || 8103}上启动成功!`);
+    console.log(`服务在 http://localhost:${process.env.PORT || 8103} 上启动成功!`);
 });

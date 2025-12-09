@@ -8,6 +8,16 @@ const configPath = path.resolve(__dirname, 'config.json');
  * @returns {Object} 配置对象
  */
 const readConfig = () => {
+    if (!fs.existsSync(configPath)) {
+        fs.writeFileSync(configPath, JSON.stringify({
+            host: '',
+            subconverter: 'https://api.v1.mk',
+            sub_config: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Mini_NoAuto.ini',
+            exclude: '',
+            filename: 'mySubs',
+            sub_links: []
+        }, null, 4), 'utf-8');
+    }
     return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 };
 

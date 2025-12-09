@@ -1,23 +1,30 @@
 <template>
-  <div class="min-h-screen p-4 pb-8">
-    <h1 class="text-2xl font-bold text-center mb-6">订阅管理</h1>
+  <div class="min-h-screen p-4 pb-8 overflow-y-auto h-full w-full max-w-[720px] mx-auto">
+    <h1 class="text-2xl font-bold text-center my-6">订阅管理</h1>
 
-    <!-- 基础配置 -->
-    <van-cell-group inset title="基础配置" class="mb-4">
-      <van-field v-model="configForm.host" label="Host" placeholder="服务地址" />
-      <van-field v-model="configForm.subconverter" label="转换器" placeholder="订阅转换地址" />
-      <van-field v-model="configForm.filename" label="文件名" placeholder="输出文件名" />
-      <van-field v-model="configForm.exclude" label="排除" placeholder="排除关键词" type="textarea" rows="2" />
-      <van-field v-model="configForm.sub_config" label="规则" placeholder="规则配置URL" />
-      <van-button type="primary" block round class="mt-4" @click="saveConfig">保存配置</van-button>
-    </van-cell-group>
+    <!-- Tab切换 -->
+    <van-tabs v-model:active="activeTab" class="pb-4 glass-tabs">
+      <van-tab title="基础配置" class="mt-10">
+        <!-- 基础配置 -->
+        <van-cell-group class="rounded-lg">
+          <van-field v-model="configForm.host" label="host" placeholder="host address" />
+          <van-field v-model="configForm.subconverter" label="subconverter" placeholder="订阅转换地址" />
+          <van-field v-model="configForm.filename" label="filename" placeholder="output filename" />
+          <van-field v-model="configForm.exclude" label="exclude" placeholder="exclude keywords" type="textarea" rows="2" />
+          <van-field v-model="configForm.sub_config" label="sub_config" placeholder="sub_config URL" />
+        </van-cell-group>
+        <button class="mt-6 w-full bg-[rgba(0,0,0,0.65)] text-white rounded-full py-2 px-4 backdrop-filter backdrop-blur-md" @click="saveConfig">保存配置</button>
+      </van-tab>
 
-    <!-- 订阅链接列表 -->
-    <van-cell-group inset title="订阅链接" class="mb-4">
-      <van-cell v-for="(link, index) in subLinks" :key="index" :title="link.filename" :label="link.url"
-        :value="'权重: ' + link.weight" is-link @click="editSubLink(link)" />
-      <van-button type="success" block round class="mt-4" @click="showAddDialog">添加订阅</van-button>
-    </van-cell-group>
+      <van-tab title="订阅链接" class="mt-10">
+        <!-- 订阅链接列表 -->
+        <van-cell-group inset class="mb-4">
+          <van-cell v-for="(link, index) in subLinks" :key="index" :title="link.filename" :label="link.url"
+            :value="'权重: ' + link.weight" is-link @click="editSubLink(link)" />
+        </van-cell-group>
+        <button class="mt-6 w-full bg-[rgba(0,0,0,0.65)] text-white rounded-full py-2 px-4 backdrop-filter backdrop-blur-md" @click="showAddDialog">添加订阅</button>
+      </van-tab>
+    </van-tabs>
 
     <!-- 添加/编辑订阅弹窗 -->
     <van-dialog v-model:show="subLinkDialog.show" :title="subLinkDialog.isEdit ? '编辑订阅' : '添加订阅'"
@@ -25,12 +32,12 @@
       <van-cell-group inset class="my-4">
         <van-field v-model="subLinkDialog.form.filename" label="文件名" placeholder="如: my.txt"
           :disabled="subLinkDialog.isEdit" />
-        <van-field v-model="subLinkDialog.form.url" label="URL" placeholder="订阅地址或localhost" />
+        <van-field v-model="subLinkDialog.form.url" label="URL" placeholder="订阅地址或 localhost" />
         <van-field v-model="subLinkDialog.form.weight" label="权重" type="number" placeholder="数字越大优先级越高" />
       </van-cell-group>
-      <div v-if="subLinkDialog.isEdit" class="px-4 pb-4">
-        <van-button type="warning" block round size="small" @click="editFileContent">编辑文件内容</van-button>
-        <van-button type="danger" block round size="small" class="mt-2" @click="removeSubLink">删除此订阅</van-button>
+      <div v-if="subLinkDialog.isEdit" class="px-4 pb-4 flex flex-col gap-2">
+        <button  @click="editFileContent" class="w-full bg-black text-white rounded-full py-2 px-4 backdrop-filter backdrop-blur-md">编辑文件内容</button>
+        <button  @click="removeSubLink" class="w-full bg-red-500 text-white rounded-full py-2 px-4 backdrop-filter backdrop-blur-md">删除此订阅</button>
       </div>
     </van-dialog>
 
@@ -63,6 +70,9 @@ import {
 import FloatingBall from '../components/FloatingBall.vue';
 
 const router = useRouter();
+
+// Tab状态
+const activeTab = ref(0);
 
 // 基础配置
 const configForm = reactive({
@@ -227,4 +237,42 @@ onMounted(() => {
   border-color: #07c160;
 }
 
+/* Tab 毛玻璃效果 */
+.glass-tabs :deep(.van-tabs__wrap) {
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-tabs :deep(.van-tabs__nav) {
+  background: transparent;
+  position: relative;
+}
+
+.glass-tabs :deep(.van-tab) {
+  flex: 1;
+  background: transparent;
+  transition: color 0.3s ease;
+  color: #666;
+  z-index: 1;
+}
+
+.glass-tabs :deep(.van-tab--active) {
+  color: #fff;
+}
+
+.glass-tabs :deep(.van-tabs__line) {
+  height: 100%;
+  width: 50% !important;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+}
 </style>
