@@ -6,7 +6,7 @@
   </div>
 
   <!-- 展开菜单 -->
-  <div v-if="menuOpen" class="floating-menu" :style="{ left: (ballPos.x - 35) + 'px', top: (ballPos.y - 200) + 'px' }">
+  <div v-if="menuOpen" class="floating-menu" :style="menuStyle">
     <div class="menu-item" @click="navigateTo('/')">返回首页</div>
     <div class="menu-item" @click="navigateTo('/sub')">我的订阅</div>
     <div class="menu-item" @click="navigateTo('/admin')">订阅管理</div>
@@ -18,17 +18,42 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-// 浮动球位置
-const ballPos = reactive({ x: window.innerWidth - 70, y: window.innerHeight - 150 });
+// 浮动球位置（初始位置更靠左）
+const ballPos = reactive({ x: window.innerWidth - 80, y: window.innerHeight - 150 });
 const menuOpen = ref(false);
 let isDragging = false;
 let dragStart = { x: 0, y: 0 };
 let hasMoved = false;
+
+// 菜单宽度
+const menuWidth = 120;
+
+/**
+ * 计算菜单位置，确保不超出屏幕
+ */
+const menuStyle = computed(() => {
+  let left = ballPos.x - 35;
+  const top = ballPos.y - 200;
+
+  // 如果菜单右边超出屏幕，向左调整
+  if (left + menuWidth > window.innerWidth - 10) {
+    left = window.innerWidth - menuWidth - 10;
+  }
+  // 如果菜单左边超出屏幕，向右调整
+  if (left < 10) {
+    left = 10;
+  }
+
+  return {
+    left: left + 'px',
+    top: Math.max(10, top) + 'px'
+  };
+});
 
 // 开始拖动
 const startDrag = (e) => {
