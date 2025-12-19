@@ -7,9 +7,9 @@ services:
       - "8103:8103"
     volumes:
       - ./files:/app/files
-      - ./config:/app/src/config
+      - ./config:/app/config
     environment:
       - ADMIN_USERNAME=admin                            # 管理员账号
       - ADMIN_PASSWORD=admin                            # 管理员密码
-      - JWT_SECRET=your_jwt_secret_key_here             # JWT 密钥         # 订阅 API Token
+      - JWT_SECRET=your_jwt_secret_key_here             # JWT 密钥
       - PORT=8103                                       # 服务端口

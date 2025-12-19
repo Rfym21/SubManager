@@ -3,5 +3,5 @@ node_modules/
 files/
 client/dist/
 package-lock.json
-src/config/config.json
+config/
 converter

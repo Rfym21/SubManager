@@ -76,7 +76,7 @@ services:
       - "8103:8103"
     volumes:
       - ./files:/app/files
-      - ./config:/app/src/config
+      - ./config:/app/config
     environment:
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=your_password
@@ -95,7 +95,7 @@ docker run -d \
   -e ADMIN_USERNAME=admin \
   -e ADMIN_PASSWORD=your_password \
   -e JWT_SECRET=your_jwt_secret \
-  -v /path/to/config:/app/src/config \
+  -v /path/to/config:/app/config \
   -v /path/to/files:/app/files \
   ghcr.io/rfym21/sub-manager:latest
 ```
@@ -110,7 +110,7 @@ docker run -d -p 8103:8103 sub-manager
 
 ## 配置说明
 
-首次启动会自动生成 `src/config/config.json` 配置文件，可通过管理界面修改：
+首次启动会自动生成 `config/config.json` 配置文件，可通过管理界面修改：
 
 | 配置项 | 说明 | 默认值 |
 |--------|------|--------|
@@ -148,8 +148,10 @@ SubManager/
 ├── client/                 # 前端项目
 │   ├── src/
 │   └── dist/              # 构建产物
+├── config/                # 配置文件目录
+│   └── config.json        # 运行时配置
 ├── src/                   # 后端项目
-│   ├── config/            # 配置管理
+│   ├── config/            # 配置管理模块
 │   ├── routes/            # API 路由
 │   ├── middleware/        # 中间件
 │   ├── utils/             # 工具函数
