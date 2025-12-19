@@ -2,6 +2,9 @@ FROM node:lts-alpine
 
 WORKDIR /app
 
+# 安装 7zip
+RUN apk add --no-cache p7zip
+
 # 复制所有文件
 COPY . .
 

@@ -3,13 +3,42 @@ const fs = require('fs');
 const path = require('path');
 const { pipeline } = require('stream/promises');
 const { spawn, execSync } = require('child_process');
-const _7z = require('7zip-min');
 
 const platform = process.platform;
 const arch = process.arch;
 const binDir = path.join(__dirname, '../converter');
 const exePath = path.join(binDir, 'subconverter.exe');
 const binPath = path.join(binDir, 'subconverter');
+
+/**
+ * 解压文件（优先使用系统 7z，否则使用 7zip-min）
+ * @param {string} archivePath - 压缩包路径
+ * @param {string} outputDir - 输出目录
+ */
+async function extract(archivePath, outputDir) {
+    // 检查系统是否有 7z 命令
+    let has7z = false;
+    try {
+        execSync('7z --help', { stdio: 'ignore' });
+        has7z = true;
+    } catch {
+        // 7z 不可用
+    }
+
+    if (has7z) {
+        // 使用系统 7z
+        execSync(`7z x "${archivePath}" -o"${outputDir}" -y`, { stdio: 'ignore' });
+    } else {
+        // 使用 7zip-min
+        const _7z = require('7zip-min');
+        await new Promise((resolve, reject) => {
+            _7z.unpack(archivePath, outputDir, err => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+}
 
 /**
  * 停止 subconverter 进程
@@ -105,12 +134,7 @@ async function start() {
         await pipeline(response.data, fs.createWriteStream(targetPath));
 
         console.log('[Converter] 正在解压...');
-        await new Promise((resolve, reject) => {
-            _7z.unpack(targetPath, binDir, err => {
-                if (err) reject(err);
-                else resolve();
-            });
-        });
+        await extract(targetPath, binDir);
 
         // 删除压缩包
         fs.unlinkSync(targetPath);
