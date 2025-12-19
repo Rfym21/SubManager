@@ -61,6 +61,16 @@ function stop() {
  */
 function startProcess() {
     const executablePath = platform === 'win32' ? exePath : binPath;
+
+    // 非 Windows 平台添加执行权限
+    if (platform !== 'win32' && fs.existsSync(executablePath)) {
+        try {
+            fs.chmodSync(executablePath, 0o755);
+        } catch {
+            // 忽略权限设置失败
+        }
+    }
+
     console.log('[Converter] 正在启动...');
     const child = spawn(executablePath, [], {
         cwd: binDir,

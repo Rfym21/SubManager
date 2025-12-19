@@ -2,8 +2,8 @@ FROM node:lts-alpine
 
 WORKDIR /app
 
-# 安装 7zip
-RUN apk add --no-cache p7zip
+# 安装 7zip 和 glibc 兼容层
+RUN apk add --no-cache p7zip libc6-compat
 
 # 复制所有文件
 COPY . .
