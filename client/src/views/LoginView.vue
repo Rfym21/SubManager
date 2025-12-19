@@ -47,7 +47,7 @@ const onSubmit = async (value) => {
             title: '一条消息',
             message: '登录成功,正在跳转管理页!',
         });
-        router.push('/admin');
+        router.push('/manage');
     } else {
         showDialog({
             title: '一条消息',

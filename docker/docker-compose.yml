@@ -1,7 +1,7 @@
 services:
   sub-manager:
     container_name: sub-manager
-    image: rfym21/sub-manager:latest
+    image: ghcr.io/rfym21/sub-manager:latest
     restart: always
     ports:
       - "8103:8103"
@@ -11,6 +11,5 @@ services:
     environment:
       - ADMIN_USERNAME=admin                            # 管理员账号
       - ADMIN_PASSWORD=admin                            # 管理员密码
-      - JWT_SECRET=your_jwt_secret_key_here             # JWT 密钥
-      - SUB_API_TOKEN=your_sub_api_token_here           # 订阅 API Token
+      - JWT_SECRET=your_jwt_secret_key_here             # JWT 密钥         # 订阅 API Token
       - PORT=8103                                       # 服务端口

@@ -11,10 +11,12 @@ const readConfig = () => {
     if (!fs.existsSync(configPath)) {
         fs.writeFileSync(configPath, JSON.stringify({
             host: '',
-            subconverter: 'https://api.v1.mk',
-            sub_config: 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Mini_NoAuto.ini',
+            subconverter: 'http://localhost:25500',
+            sub_config: 'config/ACL4SSR_Online_Mini_NoAuto.ini',
             exclude: '',
             filename: 'mySubs',
+            cacheTime: 5,
+            tokens: [],
             sub_links: []
         }, null, 4), 'utf-8');
     }
@@ -38,7 +40,6 @@ module.exports = {
     admin_username: process.env.ADMIN_USERNAME || 'admin',
     admin_password: process.env.ADMIN_PASSWORD || 'admin',
     secret: process.env.JWT_SECRET || 'default_jwt_secret_key',
-    sub_api_token: process.env.SUB_API_TOKEN || 'default_sub_api_token',
 
     // 文件配置（动态读取）
     get host() {
@@ -55,6 +56,12 @@ module.exports = {
     },
     get filename() {
         return readConfig().filename || 'mySubs';
+    },
+    get cacheTime() {
+        return readConfig().cacheTime || 30;
+    },
+    get tokens() {
+        return readConfig().tokens || [];
     },
     get sub_links() {
         return readConfig().sub_links || [];

@@ -4,16 +4,19 @@
 
 ## 功能特性
 
-- 订阅链接管理（添加、删除、编辑）
+- 订阅链接管理（添加、删除、编辑、启用/禁用）
 - 多订阅合并为单一链接
+- 多 Token 管理（不同 Token 可访问不同订阅）
+- 订阅文件编辑
 - 支持自定义订阅转换后端
 - 支持自定义转换规则配置
 - 节点过滤（排除关键词）
+- 独立缓存时间配置
 
 ## 技术栈
 
 **后端**: Node.js + Express
-**前端**: Vue 3 + Vite + TailwindCSS
+**前端**: Vue 3 + Vite + Vant + TailwindCSS
 
 ## 快速开始
 
@@ -33,7 +36,6 @@ cp .env.example .env
 | `ADMIN_USERNAME` | 管理员用户名 | `admin` |
 | `ADMIN_PASSWORD` | 管理员密码 | `admin` |
 | `JWT_SECRET` | JWT 签名密钥 | `default_jwt_secret_key` |
-| `SUB_API_TOKEN` | 订阅 API 访问令牌 | `default_sub_api_token` |
 
 ### 2. 安装依赖并构建
 
@@ -68,7 +70,7 @@ docker compose up -d
 services:
   sub-manager:
     container_name: sub-manager
-    image: rfym21/sub-manager:latest
+    image: ghcr.io/rfym21/sub-manager:latest
     restart: always
     ports:
       - "8103:8103"
@@ -79,24 +81,23 @@ services:
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=your_password
       - JWT_SECRET=your_jwt_secret
-      - SUB_API_TOKEN=your_api_token
       - PORT=8103
 ```
 
 ### 使用 Docker 命令
 
 ```bash
-docker pull rfym21/sub-manager:latest
+docker pull ghcr.io/rfym21/sub-manager:latest
 
 docker run -d \
+  --name sub-manager \
   -p 8103:8103 \
   -e ADMIN_USERNAME=admin \
   -e ADMIN_PASSWORD=your_password \
   -e JWT_SECRET=your_jwt_secret \
-  -e SUB_API_TOKEN=your_api_token \
   -v /path/to/config:/app/src/config \
   -v /path/to/files:/app/files \
-  rfym21/sub-manager:latest
+  ghcr.io/rfym21/sub-manager:latest
 ```
 
 ### 本地构建
@@ -118,7 +119,28 @@ docker run -d -p 8103:8103 sub-manager
 | `sub_config` | 转换规则配置 URL | ACL4SSR 规则 |
 | `exclude` | 节点排除关键词 | 空 |
 | `filename` | 导出文件名 | `mySubs` |
+| `cacheTime` | 全局缓存时间（分钟） | `0`（不缓存） |
 | `sub_links` | 订阅链接列表 | `[]` |
+| `tokens` | Token 列表 | `[]` |
+
+### 订阅链接配置
+
+每个订阅链接支持以下字段：
+
+| 字段 | 说明 |
+|------|------|
+| `filename` | 文件名（唯一标识） |
+| `url` | 订阅地址，`localhost` 表示本地订阅 |
+| `remark` | 备注名称 |
+| `weight` | 权重（越大越靠前） |
+| `status` | 启用状态 |
+| `cacheTime` | 独立缓存时间（分钟），留空使用全局配置 |
+
+### Token 管理
+
+支持创建多个 Token，每个 Token 可以：
+- 设置可访问的订阅列表（留空则可访问全部）
+- 独立启用/禁用
 
 ## 项目结构
 
@@ -130,6 +152,8 @@ SubManager/
 ├── src/                   # 后端项目
 │   ├── config/            # 配置管理
 │   ├── routes/            # API 路由
+│   ├── middleware/        # 中间件
+│   ├── utils/             # 工具函数
 │   └── index.js           # 入口文件
 ├── docker/                # Docker 相关
 │   ├── Dockerfile

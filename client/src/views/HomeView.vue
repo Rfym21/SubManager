@@ -2,7 +2,7 @@
     <div class="flex flex-col items-center justify-center min-h-screen">
         <div class="text-center w-[90vw] max-w-[720px] mx-auto">
             <h1 class="text-4xl font-bold">A <span class="inline-block text-5xl"></span> Subscription</h1>
-            <a class="inline-block bg-opacity-30 backdrop-filter bg-purple-300 rounded-full py-1 px-4 text-purple-700 my-3"
+            <a class="inline-block bg-opacity-30 backdrop-filter bg-purple-500 rounded-full py-1 px-4 text-gray-700 my-3"
                 href="https://github.com/Rfym21" target="_blank">兜豆子</a>
             <p class="text-xl w-full mx-auto font-bold mb-6 text-center">Welcome to my subscription service page!</p>
             <p class="text-medium w-full  mb-6 text-center">This is an undisclosed subscription aggregation service for personal use only, if you have any questions, please feel free to contact me.</p>

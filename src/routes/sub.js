@@ -6,21 +6,21 @@ const { verifySubApiToken, verifyAdminToken } = require('../middleware/authoriza
 const { getSubLinks } = require('../utils/manager.js');
 
 /**
- * 获取订阅链接信息（需要管理员认证）
+ * 获取所有 token 的订阅链接信息（需要管理员认证）
  */
 router.get('/sub/info', verifyAdminToken, (req, res) => {
-    res.json({
-        status: true,
-        data: {
-            base64_url: `${config.host}/base64?token=${config.sub_api_token}`,
-            sub_url: `${config.host}/sub?token=${config.sub_api_token}`
-        }
-    });
+    const tokens = config.tokens.filter(t => t.status !== false);
+    const data = tokens.map(t => ({
+        name: t.name,
+        base64_url: `${config.host}/base64?token=${t.token}`,
+        sub_url: `${config.host}/sub?token=${t.token}`
+    }));
+    res.json({ status: true, data });
 });
 
 router.get('/base64', verifySubApiToken, async (req, res) => {
     try {
-        const data = await getSubLinks();
+        const data = await getSubLinks(req.tokenInfo);
         res.send(data);
     } catch (e) {
         res.status(500).json({ status: false, message: e.message });
@@ -31,7 +31,7 @@ router.get('/sub', verifySubApiToken, async (req, res) => {
     try {
         const params = new URLSearchParams({
             target: 'clash',
-            url: `${config.host}/base64?token=${config.sub_api_token}`,
+            url: `${config.host}/base64?token=${req.query.token}`,
             config: config.sub_config,
             emoji: 'true',
             list: 'false',

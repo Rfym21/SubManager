@@ -9,7 +9,9 @@
   <div v-if="menuOpen" class="floating-menu" :style="menuStyle">
     <div class="menu-item" @click="navigateTo('/')">返回首页</div>
     <div class="menu-item" @click="navigateTo('/sub')">我的订阅</div>
-    <div class="menu-item" @click="navigateTo('/admin')">订阅管理</div>
+    <div class="menu-item" @click="navigateTo('/manage')">订阅管理</div>
+    <div class="menu-item" @click="navigateTo('/token')">令牌管理</div>
+    <div class="menu-item" @click="navigateTo('/setting')">基础配置</div>
     <div class="menu-item" @click="handleLogout">退出登录</div>
   </div>
 
@@ -38,7 +40,7 @@ const menuWidth = 120;
  */
 const menuStyle = computed(() => {
   let left = ballPos.x - 35;
-  const top = ballPos.y - 200;
+  const top = ballPos.y - 280;
 
   // 如果菜单右边超出屏幕，向左调整
   if (left + menuWidth > window.innerWidth - 10) {

@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 全局黑白色系覆盖 Vant 主题 */
+:root {
+  --van-primary-color: #1d1d1f;
+  --van-success-color: #1d1d1f;
+  --van-danger-color: #666;
+  --van-warning-color: #666;
+  --van-text-color: #1d1d1f;
+  --van-text-color-2: #86868b;
+  --van-text-color-3: #c6c6c8;
+  --van-active-color: #f5f5f7;
+  --van-button-primary-background: #1d1d1f;
+  --van-button-primary-border-color: #1d1d1f;
+  --van-button-default-background: #f5f5f7;
+  --van-button-default-border-color: rgba(0, 0, 0, 0.08);
+  --van-dialog-confirm-button-text-color: #1d1d1f;
+}
+
+/* 全局按钮样式 */
+.van-button--primary {
+  background-color: #1d1d1f !important;
+  border-color: #1d1d1f !important;
+}
+
+.van-button--primary:active {
+  background-color: #000 !important;
+  border-color: #000 !important;
+}
+
+/* Dialog 确认按钮 */
+.van-dialog__confirm {
+  color: #1d1d1f !important;
+}
+
+.van-dialog__cancel {
+  color: #86868b !important;
+}
+
+/* Toast 样式 */
+.van-toast {
+  background: rgba(0, 0, 0, 0.8) !important;
+}

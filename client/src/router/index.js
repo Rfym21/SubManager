@@ -31,13 +31,31 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue')
     },
     {
-      path: '/admin',
-      name: 'Admin',
+      path: '/manage',
+      name: 'Manage',
       meta: {
-        title: 'Dashboard Panel',
+        title: 'Manage Panel',
         whiteList: false
       },
       component: () => import('../views/AdminView.vue')
+    },
+    {
+      path: '/setting',
+      name: 'Setting',
+      meta: {
+        title: 'Setting',
+        whiteList: false
+      },
+      component: () => import('../views/SettingView.vue')
+    },
+    {
+      path: '/token',
+      name: 'Token',
+      meta: {
+        title: 'Token Management',
+        whiteList: false
+      },
+      component: () => import('../views/TokenView.vue')
     },
     {
       path: '/:pathMatch(.*)*',

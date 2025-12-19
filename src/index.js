@@ -6,6 +6,7 @@ const cors = require('cors');
 const users = require('./routes/users.js');
 const sub = require('./routes/sub.js');
 const config = require('./routes/config.js');
+const converter = require('../scripts/converter.js');
 
 // ---------------------------------以下为中间件配置---------------------------------
 app.use(cors());
@@ -57,7 +58,22 @@ process.on('uncaughtException', (error) => {
     console.error('未捕获的异常:', error);
 });
 
+/**
+ * 进程退出时停止 converter
+ */
+process.on('SIGINT', () => {
+    console.log('\n正在关闭服务...');
+    converter.stop();
+    process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+    converter.stop();
+    process.exit(0);
+});
+
 // ---------------------------------以下为服务启动---------------------------------
 app.listen(process.env.PORT || 8103, async () => {
     console.log(`服务在 http://localhost:${process.env.PORT || 8103} 上启动成功!`);
+    await converter.start();
 });

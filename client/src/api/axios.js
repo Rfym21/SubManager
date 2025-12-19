@@ -152,3 +152,55 @@ export const getSubInfo = async () => {
         return { status: false, message: err.message };
     }
 };
+
+/**
+ * 获取所有 tokens
+ */
+export const getTokens = async () => {
+    try {
+        const res = await axios.get('/config/tokens', { headers: getAuthHeaders() });
+        return res.data;
+    } catch (err) {
+        return { status: false, message: err.message };
+    }
+};
+
+/**
+ * 添加 token
+ * @param {Object} data - { name, subscriptions }
+ */
+export const addToken = async (data) => {
+    try {
+        const res = await axios.post('/config/tokens', data, { headers: getAuthHeaders() });
+        return res.data;
+    } catch (err) {
+        return { status: false, message: err.message };
+    }
+};
+
+/**
+ * 修改 token
+ * @param {string} name - 目标 name
+ * @param {Object} data - { name, status, subscriptions }
+ */
+export const updateToken = async (name, data) => {
+    try {
+        const res = await axios.patch(`/config/tokens/${encodeURIComponent(name)}`, data, { headers: getAuthHeaders() });
+        return res.data;
+    } catch (err) {
+        return { status: false, message: err.message };
+    }
+};
+
+/**
+ * 删除 token
+ * @param {string} name
+ */
+export const deleteToken = async (name) => {
+    try {
+        const res = await axios.delete(`/config/tokens/${encodeURIComponent(name)}`, { headers: getAuthHeaders() });
+        return res.data;
+    } catch (err) {
+        return { status: false, message: err.message };
+    }
+};
