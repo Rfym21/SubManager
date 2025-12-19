@@ -12,8 +12,7 @@ router.get('/sub/info', verifyAdminToken, (req, res) => {
     const tokens = config.tokens.filter(t => t.status !== false);
     const data = tokens.map(t => ({
         name: t.name,
-        base64_url: `${config.host}/base64?token=${t.token}`,
-        sub_url: `${config.host}/sub?token=${t.token}`
+        token: t.token
     }));
     res.json({ status: true, data });
 });
@@ -31,7 +30,7 @@ router.get('/sub', verifySubApiToken, async (req, res) => {
     try {
         const params = new URLSearchParams({
             target: 'clash',
-            url: `${config.host}/base64?token=${req.query.token}`,
+            url: `http://localhost:${config.port}/base64?token=${req.query.token}`,
             config: config.sub_config,
             emoji: 'true',
             list: 'false',

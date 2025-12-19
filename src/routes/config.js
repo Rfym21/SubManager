@@ -20,14 +20,13 @@ router.get('/config', verifyAdminToken, (req, res) => {
 });
 
 /**
- * 修改基础配置 (host, subconverter, filename, exclude, sub_config, cacheTime)
+ * 修改基础配置 (subconverter, filename, exclude, sub_config, cacheTime)
  */
 router.patch('/config', verifyAdminToken, (req, res) => {
     try {
-        const { host, subconverter, filename, exclude, sub_config, cacheTime } = req.body;
+        const { subconverter, filename, exclude, sub_config, cacheTime } = req.body;
         const config = readConfig();
 
-        if (host !== undefined) config.host = host;
         if (subconverter !== undefined) config.subconverter = subconverter;
         if (filename !== undefined) config.filename = filename;
         if (exclude !== undefined) config.exclude = exclude;

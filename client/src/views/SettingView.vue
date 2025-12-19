@@ -4,7 +4,6 @@
 
     <!-- 基础配置 -->
     <van-cell-group class="rounded-lg">
-      <van-field v-model="configForm.host" label="host" placeholder="host address" />
       <van-field v-model="configForm.subconverter" label="subconverter" placeholder="订阅转换地址" />
       <van-field v-model="configForm.filename" label="filename" placeholder="output filename" />
       <van-field v-model="configForm.exclude" label="exclude" placeholder="exclude keywords" type="textarea" rows="2" />
@@ -26,7 +25,6 @@ import FloatingBall from '../components/FloatingBall.vue';
 
 // 基础配置
 const configForm = reactive({
-  host: '',
   subconverter: '',
   filename: '',
   exclude: '',

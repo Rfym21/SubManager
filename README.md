@@ -114,7 +114,6 @@ docker run -d -p 8103:8103 sub-manager
 
 | 配置项 | 说明 | 默认值 |
 |--------|------|--------|
-| `host` | 服务访问地址 | `http://localhost:8103` |
 | `subconverter` | 订阅转换后端地址 | `https://api.v1.mk` |
 | `sub_config` | 转换规则配置 URL | ACL4SSR 规则 |
 | `exclude` | 节点排除关键词 | 空 |

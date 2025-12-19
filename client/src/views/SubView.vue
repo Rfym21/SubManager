@@ -65,6 +65,11 @@ import FloatingBall from '../components/FloatingBall.vue';
 
 const router = useRouter();
 
+// 获取当前网站 host
+const getHost = () => {
+  return `${window.location.protocol}//${window.location.host}`;
+};
+
 // Token 列表
 const tokenList = ref([]);
 
@@ -73,11 +78,12 @@ const selectedToken = ref('');
 
 // 当前选中的订阅信息
 const currentSubInfo = computed(() => {
-  const token = tokenList.value.find(t => t.name === selectedToken.value);
-  if (token) {
+  const tokenData = tokenList.value.find(t => t.name === selectedToken.value);
+  if (tokenData) {
+    const host = getHost();
     return {
-      sub_url: token.sub_url,
-      base64_url: token.base64_url
+      sub_url: `${host}/sub?token=${tokenData.token}`,
+      base64_url: `${host}/base64?token=${tokenData.token}`
     };
   }
   return {

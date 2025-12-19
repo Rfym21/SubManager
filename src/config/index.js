@@ -10,7 +10,6 @@ const configPath = path.resolve(__dirname, 'config.json');
 const readConfig = () => {
     if (!fs.existsSync(configPath)) {
         fs.writeFileSync(configPath, JSON.stringify({
-            host: '',
             subconverter: 'http://localhost:25500',
             sub_config: 'config/ACL4SSR_Online_Mini_NoAuto.ini',
             exclude: '',
@@ -42,9 +41,6 @@ module.exports = {
     secret: process.env.JWT_SECRET || 'default_jwt_secret_key',
 
     // 文件配置（动态读取）
-    get host() {
-        return readConfig().host || 'http://localhost:8103';
-    },
     get subconverter() {
         return readConfig().subconverter || 'https://api.v1.mk';
     },
