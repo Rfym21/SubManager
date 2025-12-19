@@ -1,9 +1,9 @@
-FROM node:lts-alpine
+FROM node:lts-slim
 
 WORKDIR /app
 
-# 安装 7zip 和 glibc 兼容层
-RUN apk add --no-cache p7zip libc6-compat
+# 安装 p7zip
+RUN apt-get update && apt-get install -y p7zip-full && rm -rf /var/lib/apt/lists/*
 
 # 复制所有文件
 COPY . .
