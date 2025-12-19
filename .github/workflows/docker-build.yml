@@ -25,6 +25,7 @@ jobs:
         run: |
           echo "name=$(jq -r .name package.json)" >> $GITHUB_OUTPUT
           echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+          echo "owner=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -47,7 +48,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ steps.package.outputs.name }}:${{ steps.package.outputs.version }}
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ steps.package.outputs.name }}:latest
+            ${{ env.REGISTRY }}/${{ steps.package.outputs.owner }}/${{ steps.package.outputs.name }}:${{ steps.package.outputs.version }}
+            ${{ env.REGISTRY }}/${{ steps.package.outputs.owner }}/${{ steps.package.outputs.name }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
