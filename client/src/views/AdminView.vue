@@ -41,7 +41,7 @@
           <span class="sub-card-tag" :class="link.url === 'localhost' ? 'tag-local' : 'tag-remote'">
             {{ link.url === 'localhost' ? '本地订阅' : '订阅链接' }}
           </span>
-          <span class="sub-card-tag">缓存:{{ link.cacheTime !== undefined ? link.cacheTime + '分钟' : '全局' }}</span>
+          <span class="sub-card-tag">缓存:{{ link.cacheTime != null ? link.cacheTime + '分钟' : '全局' }}</span>
         </div>
         <div class="sub-card-cache-info" v-if="link.url !== 'localhost'">
           <span>更新: {{ link.lastUpdateTime ? formatTime(link.lastUpdateTime) : '从未' }}</span>
@@ -375,7 +375,7 @@ const formatTime = (timestamp) => {
  */
 const isCacheExpired = (link) => {
   if (!link.lastUpdateTime) return true;
-  const cacheTime = link.cacheTime !== undefined ? link.cacheTime : globalCacheTime.value;
+  const cacheTime = link.cacheTime != null ? link.cacheTime : globalCacheTime.value;
   if (!cacheTime) return true;
   const expireTime = link.lastUpdateTime + cacheTime * 60 * 1000;
   return Date.now() > expireTime;
@@ -388,7 +388,7 @@ const isCacheExpired = (link) => {
  */
 const getCacheStatus = (link) => {
   if (!link.lastUpdateTime) return '未缓存';
-  const cacheTime = link.cacheTime !== undefined ? link.cacheTime : globalCacheTime.value;
+  const cacheTime = link.cacheTime != null ? link.cacheTime : globalCacheTime.value;
   if (!cacheTime) return '无缓存配置';
   const expireTime = link.lastUpdateTime + cacheTime * 60 * 1000;
   if (Date.now() > expireTime) {
@@ -410,7 +410,7 @@ const editSubLink = (link) => {
   subLinkDialog.originalFilename = link.filename;
   subLinkDialog.form = {
     ...link,
-    cacheTime: link.cacheTime !== undefined ? link.cacheTime : ''
+    cacheTime: link.cacheTime != null ? link.cacheTime : ''
   };
   subLinkDialog.show = true;
 };
@@ -420,7 +420,8 @@ const submitSubLink = async () => {
   const { isEdit, originalFilename, form } = subLinkDialog;
   const submitData = {
     ...form,
-    cacheTime: form.cacheTime !== '' ? Number(form.cacheTime) : undefined
+    // 编辑时清空则发送 null（删除属性回退全局），添加时清空则不发送
+    cacheTime: form.cacheTime !== '' ? Number(form.cacheTime) : (isEdit ? null : undefined)
   };
   let res;
   if (isEdit) {

@@ -2,8 +2,15 @@ FROM node:lts-slim
 
 WORKDIR /app
 
-# 安装 p7zip
-RUN apt-get update && apt-get install -y p7zip-full && rm -rf /var/lib/apt/lists/*
+# 安装 p7zip 和 subconverter 运行依赖
+RUN apt-get update && apt-get install -y \
+    p7zip-full \
+    file \
+    libpcre2-8-0 \
+    ca-certificates \
+    libstdc++6 \
+    libgcc-s1 \
+    && rm -rf /var/lib/apt/lists/*
 
 # 复制所有文件
 COPY . .

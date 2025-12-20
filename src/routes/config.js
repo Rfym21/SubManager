@@ -112,7 +112,12 @@ router.patch('/config/sub_links/:filename', verifyAdminToken, (req, res) => {
         if (weight !== undefined) config.sub_links[index].weight = weight;
         if (status !== undefined) config.sub_links[index].status = status;
         if (remark !== undefined) config.sub_links[index].remark = remark;
-        if (cacheTime !== undefined) config.sub_links[index].cacheTime = cacheTime;
+        // cacheTime 为 null 时删除属性（回退到全局设置），有值时设置
+        if (cacheTime === null) {
+            delete config.sub_links[index].cacheTime;
+        } else if (cacheTime !== undefined) {
+            config.sub_links[index].cacheTime = cacheTime;
+        }
 
         saveConfig(config);
         res.json({ status: true, data: config.sub_links[index] });

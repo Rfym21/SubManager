@@ -30,7 +30,7 @@ router.get('/sub', verifySubApiToken, async (req, res) => {
     try {
         const params = new URLSearchParams({
             target: 'clash',
-            url: `http://localhost:${config.port}/base64?token=${req.query.token}`,
+            url: `http://localhost:${process.env.PORT || 8103}/base64?token=${req.query.token}`,
             config: config.sub_config,
             emoji: 'true',
             list: 'false',

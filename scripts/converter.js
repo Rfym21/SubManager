@@ -25,18 +25,35 @@ async function extract(archivePath, outputDir) {
         // 7z 不可用
     }
 
-    if (has7z) {
-        // 使用系统 7z
-        execSync(`7z x "${archivePath}" -o"${outputDir}" -y`, { stdio: 'ignore' });
-    } else {
-        // 使用 7zip-min
-        const _7z = require('7zip-min');
-        await new Promise((resolve, reject) => {
-            _7z.unpack(archivePath, outputDir, err => {
-                if (err) reject(err);
-                else resolve();
+    /**
+     * 执行单次解压
+     * @param {string} filePath - 要解压的文件路径
+     */
+    const doExtract = async (filePath) => {
+        if (has7z) {
+            execSync(`7z x "${filePath}" -o"${outputDir}" -y`, { stdio: 'ignore' });
+        } else {
+            const _7z = require('7zip-min');
+            await new Promise((resolve, reject) => {
+                _7z.unpack(filePath, outputDir, err => {
+                    if (err) reject(err);
+                    else resolve();
+                });
             });
-        });
+        }
+    };
+
+    // 第一次解压
+    await doExtract(archivePath);
+
+    // 处理 .tar.gz 双层压缩：检查是否产生了 .tar 文件
+    if (archivePath.endsWith('.tar.gz') || archivePath.endsWith('.tgz')) {
+        const tarName = path.basename(archivePath).replace(/\.(tar\.gz|tgz)$/, '.tar');
+        const tarPath = path.join(outputDir, tarName);
+        if (fs.existsSync(tarPath)) {
+            await doExtract(tarPath);
+            fs.unlinkSync(tarPath);
+        }
     }
 }
 
@@ -62,23 +79,72 @@ function stop() {
 function startProcess() {
     const executablePath = platform === 'win32' ? exePath : binPath;
 
+    console.log('[Converter] 执行文件路径:', executablePath);
+    console.log('[Converter] 文件存在:', fs.existsSync(executablePath));
+
+    if (fs.existsSync(executablePath)) {
+        const stats = fs.statSync(executablePath);
+        console.log('[Converter] 文件大小:', stats.size, 'bytes');
+        console.log('[Converter] 文件权限:', '0' + (stats.mode & 0o777).toString(8));
+    }
+
     // 非 Windows 平台添加执行权限
     if (platform !== 'win32' && fs.existsSync(executablePath)) {
         try {
             fs.chmodSync(executablePath, 0o755);
-        } catch {
-            // 忽略权限设置失败
+            console.log('[Converter] 已设置执行权限');
+        } catch (err) {
+            console.log('[Converter] 设置执行权限失败:', err.message);
         }
     }
 
     console.log('[Converter] 正在启动...');
-    const child = spawn(executablePath, [], {
-        cwd: binDir,
-        detached: true,
-        stdio: 'ignore'
-    });
-    child.unref();
-    console.log('[Converter] 已启动');
+    try {
+        const child = spawn(executablePath, [], {
+            cwd: binDir,
+            detached: true,
+            stdio: 'ignore'
+        });
+
+        child.on('error', (err) => {
+            console.error('[Converter] 进程错误:', err.message);
+        });
+
+        child.unref();
+        console.log('[Converter] 已启动，PID:', child.pid);
+    } catch (err) {
+        console.error('[Converter] 启动失败:', err.message);
+    }
+}
+
+/**
+ * 验证二进制文件架构是否与当前系统匹配
+ * @param {string} filePath - 可执行文件路径
+ * @returns {boolean} 架构是否匹配
+ */
+function validateArchitecture(filePath) {
+    if (platform === 'win32') {
+        // Windows 不做额外验证
+        return true;
+    }
+
+    try {
+        const output = execSync(`file "${filePath}"`, { encoding: 'utf-8' });
+        console.log('[Converter] 文件类型:', output.trim());
+
+        // 检查架构匹配
+        if (arch === 'arm64') {
+            // ARM64 应该包含 aarch64 或 ARM aarch64
+            return output.includes('aarch64') || output.includes('ARM');
+        } else if (arch === 'x64') {
+            // x64 应该包含 x86-64 或 x86_64
+            return output.includes('x86-64') || output.includes('x86_64');
+        }
+        return true;
+    } catch (err) {
+        console.log('[Converter] 架构验证失败:', err.message);
+        return true; // 验证失败时默认通过，避免误删
+    }
 }
 
 /**
@@ -92,11 +158,18 @@ async function start() {
     stop();
 
     try {
-        // 已存在 subconverter 可执行文件则跳过下载，直接启动
+        const executablePath = platform === 'win32' ? exePath : binPath;
+
+        // 已存在 subconverter 可执行文件则验证架构
         if (fs.existsSync(exePath) || fs.existsSync(binPath)) {
-            console.log('[Converter] 已存在，跳过下载');
-            startProcess();
-            return;
+            if (validateArchitecture(executablePath)) {
+                console.log('[Converter] 已存在且架构匹配，跳过下载');
+                startProcess();
+                return;
+            } else {
+                console.log('[Converter] 架构不匹配，重新下载...');
+                fs.rmSync(binDir, { recursive: true });
+            }
         }
 
         console.log('[Converter] 正在检索版本信息...');
@@ -152,11 +225,23 @@ async function start() {
         // 处理嵌套目录：将 converter/subconverter/* 移动到 converter/*
         const nestedDir = path.join(binDir, 'subconverter');
         if (fs.existsSync(nestedDir) && fs.statSync(nestedDir).isDirectory()) {
-            const files = fs.readdirSync(nestedDir);
+            // 先重命名嵌套目录避免与内部文件同名冲突
+            const tempDir = path.join(binDir, '_temp_subconverter');
+            fs.renameSync(nestedDir, tempDir);
+            const files = fs.readdirSync(tempDir);
             for (const file of files) {
-                fs.renameSync(path.join(nestedDir, file), path.join(binDir, file));
+                fs.renameSync(path.join(tempDir, file), path.join(binDir, file));
             }
-            fs.rmdirSync(nestedDir);
+            fs.rmdirSync(tempDir);
+        }
+
+        // 调试：列出解压后的文件
+        console.log('[Converter] 解压后的文件:', fs.readdirSync(binDir));
+
+        // 检查可执行文件是否存在
+        if (!fs.existsSync(executablePath)) {
+            console.error(`[Converter] 可执行文件不存在: ${executablePath}`);
+            return;
         }
 
         console.log('[Converter] 下载并解压成功');

@@ -14,7 +14,7 @@ const filesDir = path.resolve(__dirname, '../../files');
  */
 const isCacheValid = (link, globalCacheTime) => {
     // 优先使用订阅自己的 cacheTime，否则使用全局的
-    const cacheTime = link.cacheTime !== undefined ? link.cacheTime : globalCacheTime;
+    const cacheTime = link.cacheTime != null ? link.cacheTime : globalCacheTime;
     if (!link.lastUpdateTime || !cacheTime) {
         return false;
     }
@@ -88,14 +88,30 @@ module.exports = {
                 // 缓存无效或不存在，从网络获取
                 const result = await axios.get(link.url, {
                     headers: {
-                        'User-Agent': 'NekoBox/Android/1.3.7 (Prefer ClashMeta Format)'
+                        'User-Agent': 'NekoBox/Android/1.3.7 (Prefer V2ray Format)'
                     }
                 });
-                const data = isValidBase64(result.data) ? base64Decode(result.data) : result.data;
 
                 // 保存到文件
-                if (!fs.existsSync(filesDir)) {
+                if (!fs.existsSync(filesDir) || !fs.existsSync(path.join(filesDir, "..", "converter","temp"))) {
                     fs.mkdirSync(filesDir, { recursive: true });
+                    fs.mkdirSync(path.join(filesDir, "..", "converter"), { recursive: true });
+                    fs.mkdirSync(path.join(filesDir, "..", "converter", "temp"), { recursive: true });
+                }
+                let data
+                if (isValidBase64(result.data)) {
+                    data = base64Decode(result.data);
+                } else {
+                    // 保存到临时文件
+                    if (!fs.existsSync(filesDir)) {
+                        fs.mkdirSync(filesDir, { recursive: true });
+                    }
+                    fs.writeFileSync(path.join(filesDir, "..", "converter", "temp", "link_temp.txt"), result.data);
+                    const temp_data = await axios.get(`http://localhost:25500/sub?${new URLSearchParams({
+                        target: 'mixed',
+                        url: "temp/link_temp.txt",
+                    })}`);
+                    data = base64Decode(temp_data.data);
                 }
                 fs.writeFileSync(path.join(filesDir, link.filename), data);
 
