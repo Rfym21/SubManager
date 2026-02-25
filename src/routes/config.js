@@ -234,7 +234,7 @@ router.get('/config/tokens', verifyAdminToken, (req, res) => {
  */
 router.post('/config/tokens', verifyAdminToken, (req, res) => {
     try {
-        const { name, subscriptions } = req.body;
+        const { name, subscriptions, subscriptionMode } = req.body;
         if (!name) {
             return res.status(400).json({ status: false, message: 'name is required' });
         }
@@ -258,7 +258,8 @@ router.post('/config/tokens', verifyAdminToken, (req, res) => {
             name,
             token,
             status: true,
-            subscriptions: subscriptions || []
+            subscriptions: subscriptions || [],
+            subscriptionMode: subscriptionMode === 'deny' ? 'deny' : 'allow'
         };
         config.tokens.push(newToken);
 
@@ -275,7 +276,7 @@ router.post('/config/tokens', verifyAdminToken, (req, res) => {
 router.patch('/config/tokens/:name', verifyAdminToken, (req, res) => {
     try {
         const targetName = req.params.name;
-        const { name, status, subscriptions } = req.body;
+        const { name, status, subscriptions, subscriptionMode } = req.body;
         const config = readConfig();
 
         const index = config.tokens.findIndex(t => t.name === targetName);
@@ -293,6 +294,7 @@ router.patch('/config/tokens/:name', verifyAdminToken, (req, res) => {
 
         if (status !== undefined) config.tokens[index].status = status;
         if (subscriptions !== undefined) config.tokens[index].subscriptions = subscriptions;
+        if (subscriptionMode !== undefined) config.tokens[index].subscriptionMode = subscriptionMode === 'deny' ? 'deny' : 'allow';
 
         saveConfig(config);
         res.json({ status: true, data: config.tokens[index] });

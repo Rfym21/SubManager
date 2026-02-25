@@ -18,7 +18,7 @@
         >下一页</button>
       </div>
       <div v-else class="pagination-placeholder"></div>
-      <button class="page-btn add-btn" @click="showAddDialog">添加 Token</button>
+      <button class="page-btn add-btn" @click="showAddDialog">添加令牌</button>
     </div>
 
     <!-- Token 卡片 -->
@@ -35,16 +35,14 @@
           <span class="token-card-status">{{ token.status === false ? '已禁用' : '启用中' }}</span>
         </div>
         <div class="token-card-token">{{ token.token }}</div>
-        <div class="token-card-subs">
-          {{ token.subscriptions?.length ? `${token.subscriptions.length} 个订阅` : '全部订阅' }}
-        </div>
+        <div class="token-card-subs">{{ getTokenSubText(token) }}</div>
       </div>
     </div>
 
     <!-- 添加/编辑 Token 弹窗 -->
     <van-dialog
       v-model:show="tokenDialog.show"
-      :title="tokenDialog.isEdit ? '编辑 Token' : '添加 Token'"
+      :title="tokenDialog.isEdit ? '编辑 Token' : '添加令牌'"
       show-cancel-button
       @confirm="submitToken"
       class="token-dialog"
@@ -60,7 +58,31 @@
 
       <!-- 订阅选择 -->
       <div class="px-4 pb-2">
-        <div class="subs-label">可用订阅（不选则全部可用）</div>
+        <div class="subs-mode-group">
+          <button
+            type="button"
+            class="subs-mode-btn"
+            :class="{ active: tokenDialog.form.subscriptionMode !== 'deny' }"
+            @click="setSubscriptionMode('allow')"
+          >
+            可用分组模式
+          </button>
+          <button
+            type="button"
+            class="subs-mode-btn"
+            :class="{ active: tokenDialog.form.subscriptionMode === 'deny' }"
+            @click="setSubscriptionMode('deny')"
+          >
+            不可用分组模式
+          </button>
+        </div>
+        <div class="subs-label">
+          {{
+            tokenDialog.form.subscriptionMode === 'deny'
+              ? '不可用分组（不选则全部可用）'
+              : '可用分组（不选则全部可用）'
+          }}
+        </div>
         <div class="subs-checkbox-group">
           <label
             v-for="sub in allSubLinks"
@@ -139,7 +161,8 @@ const tokenDialog = reactive({
     name: '',
     token: '',
     status: true,
-    subscriptions: []
+    subscriptions: [],
+    subscriptionMode: 'allow'
   }
 });
 
@@ -164,7 +187,7 @@ const loadSubLinks = async () => {
 // 显示添加弹窗
 const showAddDialog = () => {
   tokenDialog.isEdit = false;
-  tokenDialog.form = { name: '', token: '', status: true, subscriptions: [] };
+  tokenDialog.form = { name: '', token: '', status: true, subscriptions: [], subscriptionMode: 'allow' };
   tokenDialog.show = true;
 };
 
@@ -176,10 +199,24 @@ const editToken = (token) => {
     name: token.name,
     token: token.token,
     status: token.status,
-    subscriptions: [...(token.subscriptions || [])]
+    subscriptions: [...(token.subscriptions || [])],
+    subscriptionMode: token.subscriptionMode === 'deny' ? 'deny' : 'allow'
   };
   tokenDialog.show = true;
 };
+
+const setSubscriptionMode = (mode) => {
+  tokenDialog.form.subscriptionMode = mode === 'deny' ? 'deny' : 'allow'
+}
+
+const getTokenSubText = (token) => {
+  const mode = token.subscriptionMode === 'deny' ? 'deny' : 'allow'
+  const count = token.subscriptions?.length || 0
+  if (mode === 'deny') {
+    return count ? `${count} 个不可用分组` : '全部分组可用'
+  }
+  return count ? `${count} 个可用分组` : '全部分组可用'
+}
 
 // 提交 Token
 const submitToken = async () => {
@@ -187,12 +224,14 @@ const submitToken = async () => {
   let res;
   if (isEdit) {
     res = await updateToken(originalName, {
-      subscriptions: form.subscriptions
+      subscriptions: form.subscriptions,
+      subscriptionMode: form.subscriptionMode
     });
   } else {
     res = await addToken({
       name: form.name,
-      subscriptions: form.subscriptions
+      subscriptions: form.subscriptions,
+      subscriptionMode: form.subscriptionMode
     });
   }
   if (res.status) {
@@ -385,6 +424,28 @@ onMounted(() => {
   font-size: 13px;
   color: #86868b;
   margin-bottom: 8px;
+}
+
+.subs-mode-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.subs-mode-btn {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  color: #1d1d1f;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.subs-mode-btn.active {
+  background: #1d1d1f;
+  color: #fff;
+  border-color: #1d1d1f;
 }
 
 .subs-checkbox-group {

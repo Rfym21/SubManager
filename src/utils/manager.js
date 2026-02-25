@@ -61,7 +61,11 @@ module.exports = {
 
         // 如果有 tokenInfo 且指定了 subscriptions，则只获取指定的订阅
         if (tokenInfo && tokenInfo.subscriptions && tokenInfo.subscriptions.length > 0) {
-            subLinks = subLinks.filter(link => tokenInfo.subscriptions.includes(link.filename));
+            if (tokenInfo.subscriptionMode === 'deny') {
+                subLinks = subLinks.filter(link => !tokenInfo.subscriptions.includes(link.filename));
+            } else {
+                subLinks = subLinks.filter(link => tokenInfo.subscriptions.includes(link.filename));
+            }
         }
 
         const globalCacheTime = config.cacheTime || 0;
