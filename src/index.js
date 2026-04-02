@@ -10,8 +10,8 @@ const converter = require('../scripts/converter.js');
 
 // ---------------------------------以下为中间件配置---------------------------------
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ---------------------------------以下为API路由---------------------------------
 app.use(users);
